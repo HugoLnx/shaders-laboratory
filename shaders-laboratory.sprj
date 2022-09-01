@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project version="2">
 	<pipeline>
-		<pass name="Noises Analysis" type="shader" active="false" patchverts="1" collapsed="true">
+		<pass name="Noises Analysis" type="shader" active="true" patchverts="1" collapsed="true">
 			<shader type="vs" path="shaders\noises-analysis\vertex.glsl" entry="main" />
 			<shader type="ps" path="shaders\noises-analysis\fragment.glsl" entry="main" />
 			<inputlayout>
@@ -22,11 +22,9 @@
 				<variable type="float2" name="iResolution2D" system="ViewportSize" />
 				<variable type="float" name="iTime" system="Time" />
 			</variables>
-			<macros>
-				<define name="SHADERED" active="true">true</define>
-			</macros>
+			<macros />
 		</pass>
-		<pass name="Template Replicate" type="shader" active="true" patchverts="1" collapsed="true">
+		<pass name="Template Replicate" type="shader" active="false" patchverts="1" collapsed="true">
 			<shader type="vs" path="shaders\template-replicate\vertex.glsl" entry="main" />
 			<shader type="ps" path="shaders\template-replicate\fragment.glsl" entry="main" />
 			<inputlayout>
@@ -49,9 +47,7 @@
 				<variable type="float" name="iTime" system="Time" />
 				<variable type="float2" name="iResolution2D" system="ViewportSize" />
 			</variables>
-			<macros>
-				<define name="SHADERED" active="true">1</define>
-			</macros>
+			<macros />
 		</pass>
 		<pass name="Replicate Wall01" type="shader" active="false" patchverts="1" collapsed="true">
 			<shader type="vs" path="shaders\replicate-wall01\vertex.glsl" entry="main" />
@@ -76,9 +72,57 @@
 				<variable type="float" name="iTime" system="Time" />
 				<variable type="float2" name="iResolution2D" system="ViewportSize" />
 			</variables>
-			<macros>
-				<define name="SHADERED" active="true">1</define>
-			</macros>
+			<macros />
+		</pass>
+		<pass name="Stars" type="shader" active="false" patchverts="1" collapsed="true">
+			<shader type="vs" path="shaders\stars\vertex.glsl" entry="main" />
+			<shader type="ps" path="shaders\stars\fragment.glsl" entry="main" />
+			<inputlayout>
+				<item value="Position" semantic="POSITION" />
+				<item value="Normal" semantic="NORMAL" />
+				<item value="Texcoord" semantic="TEXCOORD0" />
+			</inputlayout>
+			<rendertexture />
+			<items>
+				<item name="StarsQuad" type="geometry">
+					<type>ScreenQuadNDC</type>
+					<width>1</width>
+					<height>1</height>
+					<depth>1</depth>
+					<topology>TriangleList</topology>
+				</item>
+			</items>
+			<itemvalues />
+			<variables>
+				<variable type="float" name="iTime" system="Time" />
+				<variable type="float2" name="iResolution2D" system="ViewportSize" />
+			</variables>
+			<macros />
+		</pass>
+		<pass name="Clouds" type="shader" active="false" patchverts="1" collapsed="true">
+			<shader type="vs" path="shaders\clouds\vertex.glsl" entry="main" />
+			<shader type="ps" path="shaders\clouds\fragment.glsl" entry="main" />
+			<inputlayout>
+				<item value="Position" semantic="POSITION" />
+				<item value="Normal" semantic="NORMAL" />
+				<item value="Texcoord" semantic="TEXCOORD0" />
+			</inputlayout>
+			<rendertexture />
+			<items>
+				<item name="CloudsQuad" type="geometry">
+					<type>ScreenQuadNDC</type>
+					<width>1</width>
+					<height>1</height>
+					<depth>1</depth>
+					<topology>TriangleList</topology>
+				</item>
+			</items>
+			<itemvalues />
+			<variables>
+				<variable type="float" name="iTime" system="Time" />
+				<variable type="float2" name="iResolution2D" system="ViewportSize" />
+			</variables>
+			<macros />
 		</pass>
 	</pipeline>
 	<objects>
