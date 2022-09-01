@@ -1,6 +1,8 @@
 #version 330
+// GITHUB: https://github.com/HugoLnx/shaders-laboratory/tree/master/shaders/stars
+// SHADERTOY: https://www.shadertoy.com/view/ftcyRS
+
 //#define SHADERTOY 1
-//#iChannel0 "file://../textures/wall01.jpg"
 
 // Aux simple functions
 #define TWO_PI 6.283185

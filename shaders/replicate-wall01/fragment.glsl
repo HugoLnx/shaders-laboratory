@@ -1,4 +1,7 @@
 #version 330
+// GITHUB: https://github.com/HugoLnx/shaders-laboratory/tree/master/shaders/replicate-wall01
+// SHADERTOY: https://www.shadertoy.com/view/flyyWy
+
 //#define SHADERTOY 1
 //#iChannel0 "file://../textures/wall01.jpg"
 

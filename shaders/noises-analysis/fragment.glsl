@@ -1,6 +1,8 @@
 #version 330
+// GITHUB: https://github.com/HugoLnx/shaders-laboratory/tree/master/shaders/noises-analysis
+// SHADERTOY: https://www.shadertoy.com/view/NlGyWy
+
 //#define SHADERTOY 1
-//#iChannel0 "file://../textures/wall01.jpg"
 
 // Aux simple functions
 #define TWO_PI 6.283185
@@ -748,9 +750,6 @@ float getNoise(vec2 uv, float seed, float t, int inx) {
   vs[0] = vMorgan;
   vs[1] = vSimplex;
   vs[2] = vPerlin;
-  vs[0] = flatten(vs[0], 3.);
-  vs[1] = flatten(vs[1], 3.);
-  vs[2] = flatten(vs[2], 3.);
   return vs[inx];
 }
 

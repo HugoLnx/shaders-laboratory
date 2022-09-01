@@ -1,6 +1,8 @@
 #version 330
+// GITHUB: https://github.com/HugoLnx/shaders-laboratory/tree/master/shaders/clouds
+// SHADERTOY: https://www.shadertoy.com/view/sttyW7
+
 //#define SHADERTOY 1
-//#iChannel0 "file://../textures/wall01.jpg"
 
 // Aux simple functions
 #define TWO_PI 6.283185
