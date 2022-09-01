@@ -1,14 +1,22 @@
 <?xml version="1.0"?>
 <project version="2">
 	<pipeline>
-		<pass name="Noise Analysis" type="shader" active="true" patchverts="1">
-			<shader type="vs" path="shaders\Noise AnalysisVS.glsl" entry="main" />
-			<shader type="ps" path="shaders\Noise AnalysisPS.glsl" entry="main" />
+		<pass name="Noises Analysis" type="shader" active="false" patchverts="1" collapsed="true">
+			<shader type="vs" path="shaders\noises-analysis\vertex.glsl" entry="main" />
+			<shader type="ps" path="shaders\noises-analysis\fragment.glsl" entry="main" />
 			<inputlayout>
 				<item value="Position" semantic="POSITION" />
 			</inputlayout>
 			<rendertexture />
-			<items />
+			<items>
+				<item name="NoisesAnalysisQuad" type="geometry">
+					<type>ScreenQuadNDC</type>
+					<width>1</width>
+					<height>1</height>
+					<depth>1</depth>
+					<topology>TriangleList</topology>
+				</item>
+			</items>
 			<itemvalues />
 			<variables>
 				<variable type="float2" name="iResolution2D" system="ViewportSize" />
@@ -18,9 +26,9 @@
 				<define name="SHADERED" active="true">true</define>
 			</macros>
 		</pass>
-		<pass name="Replication Base" type="shader" active="true" patchverts="1">
-			<shader type="vs" path="shaders\Replication BaseVS.glsl" entry="main" />
-			<shader type="ps" path="shaders\Replication BasePS.glsl" entry="main" />
+		<pass name="Template Replicate" type="shader" active="true" patchverts="1" collapsed="true">
+			<shader type="vs" path="shaders\template-replicate\vertex.glsl" entry="main" />
+			<shader type="ps" path="shaders\template-replicate\fragment.glsl" entry="main" />
 			<inputlayout>
 				<item value="Position" semantic="POSITION" />
 				<item value="Normal" semantic="NORMAL" />
@@ -28,7 +36,34 @@
 			</inputlayout>
 			<rendertexture />
 			<items>
-				<item name="Quad" type="geometry">
+				<item name="TemplateReplicateQuad" type="geometry">
+					<type>ScreenQuadNDC</type>
+					<width>1</width>
+					<height>1</height>
+					<depth>1</depth>
+					<topology>TriangleList</topology>
+				</item>
+			</items>
+			<itemvalues />
+			<variables>
+				<variable type="float" name="iTime" system="Time" />
+				<variable type="float2" name="iResolution2D" system="ViewportSize" />
+			</variables>
+			<macros>
+				<define name="SHADERED" active="true">1</define>
+			</macros>
+		</pass>
+		<pass name="Replicate Wall01" type="shader" active="false" patchverts="1" collapsed="true">
+			<shader type="vs" path="shaders\replicate-wall01\vertex.glsl" entry="main" />
+			<shader type="ps" path="shaders\replicate-wall01\fragment.glsl" entry="main" />
+			<inputlayout>
+				<item value="Position" semantic="POSITION" />
+				<item value="Normal" semantic="NORMAL" />
+				<item value="Texcoord" semantic="TEXCOORD0" />
+			</inputlayout>
+			<rendertexture />
+			<items>
+				<item name="ReplicateWall01Quad" type="geometry">
 					<type>ScreenQuadNDC</type>
 					<width>1</width>
 					<height>1</height>
@@ -48,7 +83,8 @@
 	</pipeline>
 	<objects>
 		<object type="texture" path="textures\wall01.jpg" vflip="false" min_filter="Linear" mag_filter="Nearest" wrap_s="Repeat" wrap_t="Repeat">
-			<bind slot="0" name="Replication Base" />
+			<bind slot="0" name="Template Replicate" />
+			<bind slot="0" name="Replicate Wall01" />
 		</object>
 	</objects>
 	<cameras />

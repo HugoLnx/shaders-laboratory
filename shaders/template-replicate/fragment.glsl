@@ -1,4 +1,6 @@
 #version 330
+//#define SHADERTOY 1
+//#iChannel0 "file://../textures/wall01.jpg"
 
 // Aux simple functions
 #define TWO_PI 6.283185
@@ -657,6 +659,9 @@ vec2 rotate(vec2 v, float angle) {
 #define RED vec3(1., 0., 0.)
 #define GRE vec3(0., 1., 0.)
 #define BLU vec3(0., 0., 1.)
+#define WRED vec3(1., .8, .8)
+#define WGRE vec3(.8, 1., .8)
+#define WBLU vec3(.8, .8, 1.)
 #define BLU2 vec3(0.35, 0.5, 1.)
 #define PUR vec3(1., 0., 1.)
 #define YEL vec3(1., 1., 0.)
@@ -721,153 +726,87 @@ vec3 v2layers(float v) {
   return c;
 }
 
-float getNoise(vec2 uv, float seed, float t, int inx) {
-  vec2 roll = -0.02*t*vec2(1.);
-  uv += roll;
-  float vs[3];
-  float vRand = random(uv, seed);
-  //float vTurbSimplex = nturbSimplex(uv, seed);
-  //float vTurb2Simplex = nturb2Simplex(uv, seed);
-  //float vFbmSimplex = nfbmSimplex(uv, seed);
-  //float vTurbMorgan = nturbMorgan(uv, seed);
-  //float vTurb2Morgan = nturb2Morgan(uv, seed);
-  //float vFbmMorgan = nfbmMorgan(uv, seed);
-  //float vTurbCellular = nturbCellular(uv, seed);
-  //float vTurb2Cellular = nturb2Cellular(uv, seed);
-  //float vFbmCellular = nfbmCellular(uv, seed);
-  float vMorgan = nmorgan(uv, seed);
-  float vSimplex = nsimplex(uv, seed);
-  float vPerlin = nperlin(uv, seed);
-  //vec2 cel = ncellular(uv, seed);
-  //float vCelX = cel.x;
-  //float vCelY = cel.y;
-  //float vCelAvg = (cel.x + cel.y)*.5;
+vec4 getNoiseA(vec2 uv, float t) {
+  float tseed = floor(t*0.1);
+  float seed  = tseed;
+  float seed2 = tseed + 373.297;
+  float seed3 = tseed + 793.713;
+  float seed4 = tseed + 127.139;
+  float seed5 = tseed + 929.197;
+  vec2 roll = -0.05*t*vec2(1.);
+  //uv += roll;
 
-  vs[0] = vMorgan;
-  vs[1] = vSimplex;
-  vs[2] = vPerlin;
-  vs[0] = flatten(vs[0], 3.);
-  vs[1] = flatten(vs[1], 3.);
-  vs[2] = flatten(vs[2], 3.);
-  return vs[inx];
+  uv *= 50.;
+  float v = 0.;
+  float v1 = 0.;
+  float v2 = 0.;
+  float v3 = 0.;
+
+
+  float splx2 = nturbSimplex(uv, seed2);
+  float splx3 = nturbSimplex(uv, seed3);
+  float splx4 = nturbSimplex(uv*0.05, seed4);
+  splx4 = xstep(0.4, 0.6, splx4) + xstep(0.8, 1., splx4) + xstep(0., .2, splx4);
+  splx4 = sat(splx4);
+
+  float splx5 = nturbSimplex(uv*0.05, seed5);
+  splx5 = xstep(0.4, 0.6, splx5) + xstep(0.8, 1., splx5) + xstep(0., .2, splx5);
+  splx5 = sat(splx5);
+
+  v2 = splx4;
+
+  uv += vec2(splx2, splx3)*0.2 + nsin(length(uv)*1.)*(0.2 + splx4) + ncos(rotate(uv, PI/4.).x*1.)*(0.2 + splx5);
+  float splx1 = nturbSimplex(uv, seed);
+  v1 = splx1*0.8 + nsin(uv.x*5.+uv.y)*0.2;
+  v1 = flatten(v1, 10.);
+  v = v1;
+
+  v = mix(0.3, 0.7, v);
+
+  return vec4(v1, v2, v3, v);
 }
 
-struct st_value {
-  float v;
-  float x0_2;
-  float x0_5;
-  float x1_2;
-  float x2;
-  float x5;
-  float x10;
-  float x20;
-};
+vec4 getNoise(vec2 uv, float t) {
+  float tseed = floor(t*0.1);
+  float seed  = tseed;
+  float seed2 = tseed + 373.297;
+  float seed3 = tseed + 793.713;
+  float seed4 = tseed + 127.139;
+  float seed5 = tseed + 929.197;
+  vec2 roll = -0.05*t*vec2(1.);
+  // uv += roll;
 
-st_value buildValues(vec2 uv, float seed, float t, int inx) {
-  st_value v;
-  v.v = getNoise(uv, seed, t, inx);
-  v.x0_2 = getNoise(uv*0.2, seed, t, inx);
-  v.x0_5 = getNoise(uv*0.5, seed, t, inx);
-  v.x1_2 = getNoise(uv*1.2, seed, t, inx);
-  v.x2 = getNoise(uv*2., seed, t, inx);
-  v.x5 = getNoise(uv*5., seed, t, inx);
-  v.x10 = getNoise(uv*10., seed, t, inx);
-  v.x20 = getNoise(uv*20., seed, t, inx);
-  //v.x30 = getNoise(uv*30., seed, t, inx);
-  //v.x100 = getNoise(uv*100., seed, t, inx);
-  return v;
-}
+  float v = 0.;
+  float v1 = 0.;
+  float v2 = 0.;
+  float v3 = 0.;
 
-void drawNoiseDescRows(inout vec3[100] sims, inout int count, inout st_value v) {
-  // row 1
-  sims[count++] = v2layers(v.v);
-  sims[count++] = WHI * v.v;
-  sims[count++] = GRE * max(v.v, v.x10);
-  sims[count++] = RED * min(v.v, v.x10);
-  sims[count++] = CYA * flatten(v.v, 10.0);
-  sims[count++] = CYA * flatten(v.v, 3.0);
-  sims[count++] = YEL * flatten(xclampnorm(v.v, 0.4, 0.6), 2.0);
-  sims[count++] = GRE * xclampnorm(v.v, .0, 0.5);
-  sims[count++] = GRE * xclampnorm(v.v, 1./3., 2./3.);
+  float rand = random(uv, seed);
+  float cel = rsat(ncellular(uv, seed).x * 10.);
+  cel = xclampnorm(cel, 0.7, 1.0);
+  float turb = ncos(nturb2Simplex(uv, seed) * 50.);
 
-  // row 2
-  sims[count++] = hsv(v.v, 1., 1.);
-  sims[count++] = WHI * v.x5;
-  sims[count++] = WHI * v.x20;
-  sims[count++] = PUR * nsin(v.v);
-  sims[count++] = PUR * ncos(v.v);
-  sims[count++] = PUR * ntan(v.v);
-  sims[count++] = BLU * (v.v/v.x2)/2.;
-  sims[count++] = BLU * (v.x10/v.v)/2.;
-  sims[count++] = CYA * (v.x5+v.x10)/2.;
+  float final = mix(0.43, 0.6, rand*0.7 + turb*0.3) + denorm(cel) * .01;
 
-  // row 3
-  sims[count++] = hsv(rsat(v.v*6.), 1., 1.);
-  sims[count++] = GRE * rsat(v.v*2.);
-  sims[count++] = GRE * rsat(v.x5*2.);
-  sims[count++] = GRE * rsat(v.v*10.);
+  v1 = rand;
+  v2 = cel;
+  v3 = turb;
+  v = final;
 
-  sims[count++] = RED * rsat(1.-v.x5);
-
-  sims[count++] = BLU * rsat(1./v.v);
-  sims[count++] = BLU * rsat(1./v.x5);
-  sims[count++] = PUR * rsat(v.v-nsin(v.v));
-  sims[count++] = PUR * rsat(v.v+ntan(v.v));
-}
-
-void drawBlendDescRows(inout vec3[100] sims, inout int count,
-  float t, st_value v1, st_value v2) {
-  st_value va = v1;
-  st_value vb = v2;
-  int invert = int(t*0.1) % 2;
-  if (invert == 1) {
-    v1 = vb;
-    v2 = va;
-  }
-
-  // row 1
-  sims[count++] = v2layers((v1.v+v2.v)/2.);
-  sims[count++] = v2layers(rsat(v1.v+v2.v));
-  sims[count++] = hsv(rsat(v1.v+v2.v), 1., 1.);
-  sims[count++] = hsv(rsat((v1.v+v2.v)*3.), 1., 1.);
-  sims[count++] = vec3(v1.v, 0., v2.v);
-  sims[count++] = vec3((v1.v+v2.v)/2., v1.v, rsat(v2.v*5.));
-  sims[count++] = vec3(1.-v1.v, v1.v, rsat(v2.v*5.));
-  sims[count++] = BLANK;
-  sims[count++] = BLANK;
-
-  // row 2
-  sims[count++] = WHI * max(v1.v, v2.v);
-  sims[count++] = WHI * min(v1.v, v2.v);
-  sims[count++] = WHI * xclamp(v2.v, v2.x10, v1.v);
-  sims[count++] = WHI * xclamp(v2.v, v2.x2, v1.x10);
-  sims[count++] = WHI * (xclamp(v1.v, .0, .5) + xclamp(v2.v, .5, 1.));
-  sims[count++] = WHI * (xclampnorm(v1.v, .0, .5) + xclampnorm(v2.v, .5, 1.));
-  sims[count++] = WHI * flatten(
-    max(xclampnorm(v1.v, .45, .55), xclampnorm(v2.v, .45, .55))
-  , 2.0);
-  sims[count++] = BLANK;
-
-  // row 3
-  sims[count++] = GRE * rsat(v1.v + v2.v);
-  sims[count++] = GRE * rsat(v1.v + v2.x5);
-  sims[count++] = RED * rsat(v1.v - v2.v);
-  sims[count++] = RED * rsat(v1.x5-v2.x10);
-  sims[count++] = BLU * (v2.x10/v1.v)/2.;
-  sims[count++] = BLU * (v1.v/v2.x10)/2.;
-  sims[count++] = BLU * rsat(v1.v / v2.v);
-  sims[count++] = BLU * rsat(1./ v1.v / v2.v);
+  return vec4(v1, v2, v3, v);
 }
 
 
-#ifdef SHADERED
+#ifndef SHADERTOY
+uniform sampler2D iChannel0;
 uniform float iTime;
 uniform vec2 iResolution2D;
 #define iResolution vec4(iResolution2D, 0., 0.)
 out vec4 outColor;
 #endif
 
-void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
   // Normalized pixel coordinates (from -0.5 to 0.5)
   float mx = max(iResolution.x, iResolution.y);
   vec2 ct = iResolution.xy / mx / 2.0;
@@ -875,54 +814,54 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
   vec2 uv2 = fragCoord / iResolution.xy - .5;
 
   float t = iTime;
-  float seed  = t;
-  float seed2 = t + 373.297;
-  float seed3 = t + 793.713;
+  t *= 0.35;
 
-  st_value v1 = buildValues(uv, seed, t, 0);
-  st_value v2 = buildValues(uv, seed2, t, 1);
-  st_value v3 = buildValues(uv, seed3, t, 2);
 
   int count = 0;
-  vec3 sims[100];
+  vec3 sims[30];
 
-  float gridWidth = 9.0;
-  float gridHeight = 9.0;
-  drawNoiseDescRows(sims, count, v1);
-  drawNoiseDescRows(sims, count, v2);
-  drawBlendDescRows(sims, count, t, v1, v2);
-  
-  
-  //float gridWidth = 3.0;
-  //float gridHeight = 3.0;
-  //sims[count++] = WHI * v1.x0_5;
-  //sims[count++] = WHI * v1.x2;
-  //sims[count++] = WHI * v1.x5;
+  vec2 uvZoom1 = uv / 2.;
+  vec2 uvZoom2 = uvZoom1 / 2.;
+  float txdiv = 3.;
 
-  //sims[count++] = WHI * v2.x0_5;
-  //sims[count++] = WHI * v2.x2;
-  //sims[count++] = WHI * v2.x5;
+  vec4 noises1 = getNoise(uv, t);
+  vec4 noises2 = getNoise(uvZoom1, t);
+  vec4 noises3 = getNoise(uvZoom2, t);
 
-  //sims[count++] = WHI * v3.x0_5;
-  //sims[count++] = WHI * v3.x2;
-  //sims[count++] = WHI * v3.x5;
+  sims[count++] = WHI * noises1.x;
+  sims[count++] = WHI * noises1.w;
+  sims[count++] = WHI * noises1.x;
+  sims[count++] = texture(iChannel0, uv/txdiv).rgb;
+  sims[count++] = WHI * noises1.y;
+  sims[count++] = WHI * noises2.w;
+  sims[count++] = WHI * noises1.y;
+  sims[count++] = texture(iChannel0, uvZoom1/txdiv).rgb;
+  sims[count++] = WHI * noises1.z;
+  sims[count++] = WHI * noises3.w;
+  sims[count++] = WHI * noises1.z;
+  sims[count++] = texture(iChannel0, uvZoom2/txdiv).rgb;
 
   uv2 += .5;
+  float gridWidth = 2.0;
+  float gridHeight = 6.0;
   float gridX = floor(uv2.x*gridWidth);
   float gridY = floor((1.-uv2.y)*gridHeight);
   int gridInx = int(floor(gridY*gridWidth + gridX));
   vec3 c;
-
+  //count = min(count, 66);
   for (int i = 0; i < count; i++) {
     c += sims[i] * (gridInx == i ? 1.0 : 0.0);
   }
+  //c = vec3(1.0-gridInx*1.0/(gridWidth*gridHeight));
+  //c = c*0.03 + 0.97*vec3(uv, length(uv));
+  //c = vec3(length(uv2));
   
 
   // Output to screen
   fragColor = vec4(c, 1.0);
 }
 
-#ifdef SHADERED
+#ifndef SHADERTOY
 void main()
 {
   mainImage(outColor, gl_FragCoord.xy);
