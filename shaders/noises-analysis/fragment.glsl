@@ -2,6 +2,7 @@
 // GITHUB: https://github.com/HugoLnx/shaders-laboratory/tree/master/shaders/noises-analysis
 // SHADERTOY: https://www.shadertoy.com/view/NlGyWy
 
+#define MIXES 1
 //#define SHADERTOY 1
 
 // Aux simple functions
@@ -734,22 +735,27 @@ float getNoise(vec2 uv, float seed, float t, int inx) {
   //float vTurb2Simplex = nturb2Simplex(uv, seed);
   //float vFbmSimplex = nfbmSimplex(uv, seed);
   //float vTurbMorgan = nturbMorgan(uv, seed);
-  //float vTurb2Morgan = nturb2Morgan(uv, seed);
+  float vTurb2Morgan = nturb2Morgan(uv, seed);
   //float vFbmMorgan = nfbmMorgan(uv, seed);
   //float vTurbCellular = nturbCellular(uv, seed);
   //float vTurb2Cellular = nturb2Cellular(uv, seed);
   //float vFbmCellular = nfbmCellular(uv, seed);
-  float vMorgan = nmorgan(uv, seed);
+  //float vMorgan = nmorgan(uv, seed);
   float vSimplex = nsimplex(uv, seed);
-  float vPerlin = nperlin(uv, seed);
-  //vec2 cel = ncellular(uv, seed);
-  //float vCelX = cel.x;
+  //float vPerlin = nperlin(uv, seed);
+  vec2 cel = ncellular(uv, seed);
+  float vCelX = cel.x;
   //float vCelY = cel.y;
   //float vCelAvg = (cel.x + cel.y)*.5;
 
-  vs[0] = vMorgan;
+  vs[0] = vCelX;
   vs[1] = vSimplex;
-  vs[2] = vPerlin;
+  vs[2] = vTurb2Morgan;
+#ifndef MIXES
+  vs[0] = flatten(vs[0], 5.0);
+  vs[1] = flatten(vs[1], 5.0);
+  vs[2] = flatten(vs[2], 5.0);
+#endif
   return vs[inx];
 }
 
@@ -887,26 +893,27 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
   int count = 0;
   vec3 sims[100];
 
+#ifdef MIXES
   float gridWidth = 9.0;
   float gridHeight = 9.0;
   drawNoiseDescRows(sims, count, v1);
   drawNoiseDescRows(sims, count, v2);
   drawBlendDescRows(sims, count, t, v1, v2);
-  
-  
-  //float gridWidth = 3.0;
-  //float gridHeight = 3.0;
-  //sims[count++] = WHI * v1.x0_5;
-  //sims[count++] = WHI * v1.x2;
-  //sims[count++] = WHI * v1.x5;
+#else
+  float gridWidth = 3.0;
+  float gridHeight = 3.0;
+  sims[count++] = WHI * v1.x0_5;
+  sims[count++] = WHI * v1.x2;
+  sims[count++] = WHI * v1.x5;
 
-  //sims[count++] = WHI * v2.x0_5;
-  //sims[count++] = WHI * v2.x2;
-  //sims[count++] = WHI * v2.x5;
+  sims[count++] = WHI * v2.x0_5;
+  sims[count++] = WHI * v2.x2;
+  sims[count++] = WHI * v2.x5;
 
-  //sims[count++] = WHI * v3.x0_5;
-  //sims[count++] = WHI * v3.x2;
-  //sims[count++] = WHI * v3.x5;
+  sims[count++] = WHI * v3.x0_5;
+  sims[count++] = WHI * v3.x2;
+  sims[count++] = WHI * v3.x5;
+#endif
 
   uv2 += .5;
   float gridX = floor(uv2.x*gridWidth);
