@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project version="2">
 	<pipeline>
-		<pass name="Noises Analysis" type="shader" active="true" patchverts="1" collapsed="true">
+		<pass name="Noises Analysis" type="shader" active="false" patchverts="1" collapsed="true">
 			<shader type="vs" path="shaders\noises-analysis\vertex.glsl" entry="main" />
 			<shader type="ps" path="shaders\noises-analysis\fragment.glsl" entry="main" />
 			<inputlayout>
@@ -74,6 +74,31 @@
 			</variables>
 			<macros />
 		</pass>
+		<pass name="Replicate Giraffe" type="shader" active="true" patchverts="1" collapsed="true">
+			<shader type="vs" path="shaders\replicate-giraffe\vertex.glsl" entry="main" />
+			<shader type="ps" path="shaders\replicate-giraffe\fragment.glsl" entry="main" />
+			<inputlayout>
+				<item value="Position" semantic="POSITION" />
+				<item value="Normal" semantic="NORMAL" />
+				<item value="Texcoord" semantic="TEXCOORD0" />
+			</inputlayout>
+			<rendertexture />
+			<items>
+				<item name="ReplicateGiraffeQuad" type="geometry">
+					<type>ScreenQuadNDC</type>
+					<width>1</width>
+					<height>1</height>
+					<depth>1</depth>
+					<topology>TriangleList</topology>
+				</item>
+			</items>
+			<itemvalues />
+			<variables>
+				<variable type="float" name="iTime" system="Time" />
+				<variable type="float2" name="iResolution2D" system="ViewportSize" />
+			</variables>
+			<macros />
+		</pass>
 		<pass name="Stars" type="shader" active="false" patchverts="1" collapsed="true">
 			<shader type="vs" path="shaders\stars\vertex.glsl" entry="main" />
 			<shader type="ps" path="shaders\stars\fragment.glsl" entry="main" />
@@ -129,6 +154,9 @@
 		<object type="texture" path="textures\wall01.jpg" vflip="false" min_filter="Linear" mag_filter="Nearest" wrap_s="Repeat" wrap_t="Repeat">
 			<bind slot="0" name="Template Replicate" />
 			<bind slot="0" name="Replicate Wall01" />
+		</object>
+		<object type="texture" path="textures\giraffe-skin-fur.jpg" vflip="false" min_filter="Linear" mag_filter="Nearest" wrap_s="Repeat" wrap_t="Repeat">
+			<bind slot="0" name="Replicate Giraffe" />
 		</object>
 	</objects>
 	<cameras />
