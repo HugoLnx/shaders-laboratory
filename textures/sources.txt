@@ -1,0 +1,13 @@
+fabric-white-woven.jpg: https://www.freepik.com/free-photo/white-woven-fabric_4139264.htm
+fabric-white-texture.jpg: https://www.freepik.com/free-photo/white-fabric-texture_928910.htm
+smooth-white-wave.jpg: https://www.freepik.com/free-vector/smooth-white-wave-background_12230268.htm
+fabric-grey.jpg: https://www.freepik.com/free-photo/full-frame-grey-fabric-texture-background_3274749.htm
+clean-simple-beige.jpg: https://www.freepik.com/free-photo/clean-simple-beige-wallpaper-background_15849685.htm
+mulberry-paper-black.jpg: https://www.freepik.com/free-photo/textured-mulberry-paper_4413647.htm
+paper-textured.jpg: https://www.freepik.com/free-photo/design-space-paper-textured-background_18665785.htm
+blue_grunge.jpg: https://www.freepik.com/free-vector/blue-grunge-halftone-detailed-texture-background_17379120.htm
+white-paper-texture.jpg: https://www.freepik.com/free-photo/white-paper-texture_1012270.htm
+shot-of-abstract-background.jpg: https://www.pexels.com/photo/full-frame-shot-of-abstract-background-247666/
+brown-and-black-textile.jpg: https://www.pexels.com/photo/brown-and-black-textile-801243/
+giraffe-skin-fur.jpg: https://www.pexels.com/photo/close-up-of-giraffe-body-skin-fur-12406721/
+fur-close-up.jpg: https://www.pexels.com/photo/close-up-of-fur-6757455/
