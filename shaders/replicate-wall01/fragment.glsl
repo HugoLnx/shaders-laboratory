@@ -1,9 +1,9 @@
 #version 330
 // GITHUB: https://github.com/HugoLnx/shaders-laboratory/tree/master/shaders/replicate-wall01
 // SHADERTOY: https://www.shadertoy.com/view/flyyWy
+// ORIGINAL: https://github.com/HugoLnx/shaders-laboratory/blob/master/textures/wall01.jpg
 
 //#define SHADERTOY 1
-//#iChannel0 "file://../textures/wall01.jpg"
 
 // Aux simple functions
 #define TWO_PI 6.283185
@@ -671,103 +671,6 @@ vec2 rotate(vec2 v, float angle) {
 #define CYA vec3(0., 1., 1.)
 #define WHI vec3(1., 1., 1.)
 #define BLANK vec3(0.35, 0., 0.35)
-
-
-vec3 v2layers(float v) {
-  // below
-  float vup = 1.;
-  float vhi = 0.65;
-  float r0 = -0.5;
-  vec3 c1b = vec3(0, 0, vhi);
-  vec3 c1e = vec3(0, 0, vup);
-  float r1 = 0.0;
-
-  // very low
-  vec3 c2b = vec3(0, vhi, vhi);
-  vec3 c2e = vec3(0, vup, vup);
-  float r2 = 0.1;
-
-  // low
-  vec3 c3b = vec3(vhi*0.7, 0, vhi);
-  vec3 c3e = vec3(vup*0.7, 0, vup);
-  float r3 = 0.3;
-
-  // midlow
-  vec3 c4b = vec3(vhi, vhi, vhi)*0.35;
-  vec3 c4e = vec3(vup, vup, vup)*0.35;
-  float r4 = 0.5;
-
-  // midhigh
-  vec3 c5b = vec3(vhi, vhi, vhi);
-  vec3 c5e = vec3(vup, vup, vup);
-  float r5 = 0.7;
-
-  // high
-  vec3 c6b = vec3(vhi, vhi, 0);
-  vec3 c6e = vec3(vup, vup, 0);
-  float r6 = 0.9;
-
-  // very high
-  vec3 c7b = vec3(vhi, vhi*0.7, 0);
-  vec3 c7e = vec3(vup, vup*0.7, 0);
-  float r7 = 1.00001;
-
-  // above
-  vec3 c8b = vec3(vhi, 0, 0);
-  vec3 c8e = vec3(vup, 0, 0);
-  float r8 = 1.5;
-
-  vec3 c;
-  c += xstep(r0, r1, v) * mix(c1b, c1e, (v-r0)/(r1-r0));
-  c += xstep(r1, r2, v) * mix(c2b, c2e, (v-r1)/(r2-r1));
-  c += xstep(r2, r3, v) * mix(c3b, c3e, (v-r2)/(r3-r2));
-  c += xstep(r3, r4, v) * mix(c4b, c4e, (v-r3)/(r4-r3));
-  c += xstep(r4, r5, v) * mix(c5b, c5e, (v-r4)/(r5-r4));
-  c += xstep(r5, r6, v) * mix(c6b, c6e, (v-r5)/(r6-r5));
-  c += xstep(r6, r7, v) * mix(c7b, c7e, (v-r6)/(r7-r6));
-  c += xstep(r7, r8, v) * mix(c8b, c8e, (v-r7)/(r8-r7));
-  return c;
-}
-
-vec4 getNoiseA(vec2 uv, float t) {
-  float tseed = floor(t*0.1);
-  float seed  = tseed;
-  float seed2 = tseed + 373.297;
-  float seed3 = tseed + 793.713;
-  float seed4 = tseed + 127.139;
-  float seed5 = tseed + 929.197;
-  vec2 roll = -0.05*t*vec2(1.);
-  //uv += roll;
-
-  uv *= 50.;
-  float v = 0.;
-  float v1 = 0.;
-  float v2 = 0.;
-  float v3 = 0.;
-
-
-  float splx2 = nturbSimplex(uv, seed2);
-  float splx3 = nturbSimplex(uv, seed3);
-  float splx4 = nturbSimplex(uv*0.05, seed4);
-  splx4 = xstep(0.4, 0.6, splx4) + xstep(0.8, 1., splx4) + xstep(0., .2, splx4);
-  splx4 = sat(splx4);
-
-  float splx5 = nturbSimplex(uv*0.05, seed5);
-  splx5 = xstep(0.4, 0.6, splx5) + xstep(0.8, 1., splx5) + xstep(0., .2, splx5);
-  splx5 = sat(splx5);
-
-  v2 = splx4;
-
-  uv += vec2(splx2, splx3)*0.2 + nsin(length(uv)*1.)*(0.2 + splx4) + ncos(rotate(uv, PI/4.).x*1.)*(0.2 + splx5);
-  float splx1 = nturbSimplex(uv, seed);
-  v1 = splx1*0.8 + nsin(uv.x*5.+uv.y)*0.2;
-  v1 = flatten(v1, 10.);
-  v = v1;
-
-  v = mix(0.3, 0.7, v);
-
-  return vec4(v1, v2, v3, v);
-}
 
 vec4 getNoise(vec2 uv, float t) {
   float tseed = floor(t*0.1);
