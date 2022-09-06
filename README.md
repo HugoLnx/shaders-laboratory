@@ -23,10 +23,26 @@ Preview varying how simple the clouds will be.
 ### Preview
 ![](https://github.com/hugolnx/shaders-laboratory/raw/master/shaders/stars/preview/shader-preview-noises-stars.gif)  
 
-## Replicate Wall01 - [Preview on Shadertoy](https://www.shadertoy.com/view/flyyWy)
-Shader trying to replicate the texture `wall01.jpg`. The right side is a few layers of the shader, and the left side is comparing both, the texture (lower half) and the shader (upper half), in 3 zoom levels.
-### Original Texture
-![](https://github.com/hugolnx/shaders-laboratory/raw/master/textures/wall01.jpg)  
+## Replicate Giraffe Fur - [Preview on Shadertoy](https://www.shadertoy.com/view/flcBRr)
+Shader trying to replicate the texture `giraffe-skin-fur.jpg`.  
+[[Original]](https://github.com/hugolnx/shaders-laboratory/raw/master/textures/giraffe-skin-fur.jpg)  
 
-### Preview
-![](https://github.com/hugolnx/shaders-laboratory/raw/master/shaders/replicate-wall01/preview/preview.png)  
+### Preview / Comparison
+Comparing the shader (upper half) and the original texture (lower half).  
+![](https://github.com/hugolnx/shaders-laboratory/raw/master/shaders/replicate-giraffe/preview/comparison.png)  
+
+### Layers / Details
+The right side is a few layers of the shader, and the left side is comparing both, the texture (lower half) and the shader (upper half), in 3 zoom levels.  
+![](https://github.com/hugolnx/shaders-laboratory/raw/master/shaders/replicate-giraffe/preview/layers.png)  
+
+## Replicate Wall01 - [Preview on Shadertoy](https://www.shadertoy.com/view/flyyWy)
+Shader trying to replicate the texture `wall01.jpg`.  
+[[Original]](https://github.com/hugolnx/shaders-laboratory/raw/master/textures/wall01.jpg)  
+
+### Comparison
+Comparing the shader (upper half) and the original texture (lower half).  
+![](https://github.com/hugolnx/shaders-laboratory/raw/master/shaders/replicate-wall01/preview/comparison.png)  
+
+### Layers / Details
+The right side is a few layers of the shader, and the left side is comparing both, the texture (lower half) and the shader (upper half), in 3 zoom levels.  
+![](https://github.com/hugolnx/shaders-laboratory/raw/master/shaders/replicate-wall01/preview/layers.png)  
