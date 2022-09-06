@@ -1,6 +1,9 @@
 #version 330
 //#define SHADERTOY 1
-//#iChannel0 "file://../textures/wall01.jpg"
+// GITHUB: https://github.com/HugoLnx/shaders-laboratory/tree/master/shaders/replicate-giraffe
+// SHADERTOY: https://www.shadertoy.com/view/flcBRr
+// ORIGINAL: https://github.com/HugoLnx/shaders-laboratory/tree/master/textures/giraffe-skin-fur.jpg
+// ORIGINAL SOURCE: https://www.pexels.com/photo/close-up-of-giraffe-body-skin-fur-12406721/
 
 // Aux simple functions
 #define TWO_PI 6.283185
@@ -27,9 +30,10 @@ float xclamp(float v, float minV, float maxV) {
 float xclampnorm(float v, float minV, float maxV) {
   return (xclamp(v, minV, maxV) - minV) / (maxV-minV);
 }
-vec3 gscale(vec3 c) {
+vec3 togrey(vec3 c) {
   return vec3((c.r+c.g+c.b)/3.);
 }
+float normrange(float v, float minV, float maxV) { return sat((v-minV)/(maxV-minV)); }
 
 // -------------------
 // BEGIN https://github.com/stegu/webgl-noise
@@ -672,103 +676,6 @@ vec2 rotate(vec2 v, float angle) {
 #define WHI vec3(1., 1., 1.)
 #define BLANK vec3(0.35, 0., 0.35)
 
-
-vec3 v2layers(float v) {
-  // below
-  float vup = 1.;
-  float vhi = 0.65;
-  float r0 = -0.5;
-  vec3 c1b = vec3(0, 0, vhi);
-  vec3 c1e = vec3(0, 0, vup);
-  float r1 = 0.0;
-
-  // very low
-  vec3 c2b = vec3(0, vhi, vhi);
-  vec3 c2e = vec3(0, vup, vup);
-  float r2 = 0.1;
-
-  // low
-  vec3 c3b = vec3(vhi*0.7, 0, vhi);
-  vec3 c3e = vec3(vup*0.7, 0, vup);
-  float r3 = 0.3;
-
-  // midlow
-  vec3 c4b = vec3(vhi, vhi, vhi)*0.35;
-  vec3 c4e = vec3(vup, vup, vup)*0.35;
-  float r4 = 0.5;
-
-  // midhigh
-  vec3 c5b = vec3(vhi, vhi, vhi);
-  vec3 c5e = vec3(vup, vup, vup);
-  float r5 = 0.7;
-
-  // high
-  vec3 c6b = vec3(vhi, vhi, 0);
-  vec3 c6e = vec3(vup, vup, 0);
-  float r6 = 0.9;
-
-  // very high
-  vec3 c7b = vec3(vhi, vhi*0.7, 0);
-  vec3 c7e = vec3(vup, vup*0.7, 0);
-  float r7 = 1.00001;
-
-  // above
-  vec3 c8b = vec3(vhi, 0, 0);
-  vec3 c8e = vec3(vup, 0, 0);
-  float r8 = 1.5;
-
-  vec3 c;
-  c += xstep(r0, r1, v) * mix(c1b, c1e, (v-r0)/(r1-r0));
-  c += xstep(r1, r2, v) * mix(c2b, c2e, (v-r1)/(r2-r1));
-  c += xstep(r2, r3, v) * mix(c3b, c3e, (v-r2)/(r3-r2));
-  c += xstep(r3, r4, v) * mix(c4b, c4e, (v-r3)/(r4-r3));
-  c += xstep(r4, r5, v) * mix(c5b, c5e, (v-r4)/(r5-r4));
-  c += xstep(r5, r6, v) * mix(c6b, c6e, (v-r5)/(r6-r5));
-  c += xstep(r6, r7, v) * mix(c7b, c7e, (v-r6)/(r7-r6));
-  c += xstep(r7, r8, v) * mix(c8b, c8e, (v-r7)/(r8-r7));
-  return c;
-}
-
-vec4 getNoiseA(vec2 uv, float t) {
-  float tseed = floor(t*0.1);
-  float seed  = tseed;
-  float seed2 = tseed + 373.297;
-  float seed3 = tseed + 793.713;
-  float seed4 = tseed + 127.139;
-  float seed5 = tseed + 929.197;
-  vec2 roll = -0.05*t*vec2(1.);
-  //uv += roll;
-
-  uv *= 50.;
-  float v = 0.;
-  float v1 = 0.;
-  float v2 = 0.;
-  float v3 = 0.;
-
-
-  float splx2 = nturbSimplex(uv, seed2);
-  float splx3 = nturbSimplex(uv, seed3);
-  float splx4 = nturbSimplex(uv*0.05, seed4);
-  splx4 = xstep(0.4, 0.6, splx4) + xstep(0.8, 1., splx4) + xstep(0., .2, splx4);
-  splx4 = sat(splx4);
-
-  float splx5 = nturbSimplex(uv*0.05, seed5);
-  splx5 = xstep(0.4, 0.6, splx5) + xstep(0.8, 1., splx5) + xstep(0., .2, splx5);
-  splx5 = sat(splx5);
-
-  v2 = splx4;
-
-  uv += vec2(splx2, splx3)*0.2 + nsin(length(uv)*1.)*(0.2 + splx4) + ncos(rotate(uv, PI/4.).x*1.)*(0.2 + splx5);
-  float splx1 = nturbSimplex(uv, seed);
-  v1 = splx1*0.8 + nsin(uv.x*5.+uv.y)*0.2;
-  v1 = flatten(v1, 10.);
-  v = v1;
-
-  v = mix(0.3, 0.7, v);
-
-  return vec4(v1, v2, v3, v);
-}
-
 vec4 getNoise(vec2 uv, float t) {
   float tseed = floor(t*0.1);
   float seed  = tseed;
@@ -784,13 +691,48 @@ vec4 getNoise(vec2 uv, float t) {
   float v2 = 0.;
   float v3 = 0.;
 
-  float rand = random(uv, seed);
+  float p4turb = nturb2Simplex(uv*3., seed);
+  p4turb = flatten(p4turb, 3.);
+  vec2 p4uv = uv/3.0 + p4turb * 0.0025;
+  vec2 p4Cel = ncellular(p4uv, seed);
+  float p4 = p4Cel.x - p4Cel.y*0.8;
+  p4 = normrange(p4, 0.0, 0.1)*2.;
+  p4 = sat(p4);
 
-  float final = rand;
+  float p2 = nturbSimplex(uv*5., seed2);
+  p2 = flatten(p2, 5.0);
+  p2 = p2 * step(0.5, p2);
 
-  v1 = rand;
-  v2 = rand;
-  v3 = rand;
+  float p3 = nfbmSimplex(uv*10., seed);
+  float p3b = nfbmSimplex(uv, seed);
+
+  vec2 uvp1 = uv;
+  float rotation = PI * 0.25;
+  //vec2 dir = vec2(cos(rotation), sin(rotation));
+  uvp1 -= cos((uvp1.y*p2)*TWO_PI*50.)*mix(.001, 0.003, flatten(p3b, 2.));
+  uvp1 = rotate(uvp1, rotation);
+  float baseZoom = 1000.0;
+  float xZoom = 1.;
+  uvp1 *= baseZoom;
+  uvp1.x *= xZoom;
+  float rand = random(vec2(floor(uvp1.x), 0.0), seed);
+  float yZoom = mix(0.001, .1, rand);
+  uvp1.y *= yZoom;
+  uvp1 = floor(uvp1);
+  float p1 = random(uvp1, seed);
+  float mixC = p3;
+  float minC = mix(0.05, 0.15, mixC);
+  float maxC = mix(0.35, 0.5, mixC);
+  float mixB = p3b;
+  float minB = mix(.65, 0.8, mixB);
+  float maxB = mix(.75, 0.9, mixB);
+  p1 = (1.-p4)*mix(minC, maxC, p1) + p4*mix(minB, maxB, p1);
+
+  float final = p1;
+
+  v1 = p1;
+  v2 = p4turb;
+  v3 = p4;
   v = final;
 
   return vec4(v1, v2, v3, v);
@@ -804,6 +746,30 @@ uniform vec2 iResolution2D;
 #define iResolution vec4(iResolution2D, 0., 0.)
 out vec4 outColor;
 #endif
+
+vec3 withColor(vec4 noises) {
+  float v = noises.w;
+  float stripes = noises.z;
+
+  // RGB(58,30,18)
+  vec3 CMIN = vec3(58., 30., 18.)/255.;
+
+  // RGB(106,62,31)
+  //vec3 CMIN = vec3(106., 62., 31.)/255.;
+
+  // RGB(157,124,103)
+  //vec3 CMAX = vec3(157., 124., 103.)/255.;
+  // RGB(190,143,120)
+  //vec3 CMAX = vec3(190.0, 143., 120.)/255.;
+
+  // RGB(126,70,27)
+  vec3 CMAX = vec3(126., 70., 27.)*2./255.;
+
+  vec3 c = mix(CMIN, CMAX, normrange(v, 0.0, 0.8));
+  //vec3 c = CMAX * normrange(v, 0.0, 0.5);
+  c = mix(c, WHI*v, stripes);
+  return c;
+}
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
@@ -820,26 +786,28 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
   int count = 0;
   vec3 sims[30];
 
+  float alldiv = .5;
   vec2 uvZoom1 = uv / 2.;
   vec2 uvZoom2 = uvZoom1 / 2.;
   float txdiv = 1.;
+  txdiv *= alldiv;
 
-  vec4 noises1 = getNoise(uv, t);
-  vec4 noises2 = getNoise(uvZoom1, t);
-  vec4 noises3 = getNoise(uvZoom2, t);
+  vec4 noises1 = getNoise(uv/alldiv, t);
+  vec4 noises2 = getNoise(uvZoom1/alldiv, t);
+  vec4 noises3 = getNoise(uvZoom2/alldiv, t);
 
   sims[count++] = WHI * noises1.x;
-  sims[count++] = WHI * noises1.w;
+  sims[count++] = withColor(noises1);
   sims[count++] = WHI * noises1.x;
-  sims[count++] = gscale(texture(iChannel0, uv/txdiv).rgb);
+  sims[count++] = texture(iChannel0, uv/txdiv).rgb;
   sims[count++] = WHI * noises1.y;
-  sims[count++] = WHI * noises2.w;
+  sims[count++] = withColor(noises2);
   sims[count++] = WHI * noises1.y;
-  sims[count++] = gscale(texture(iChannel0, uvZoom1/txdiv).rgb);
+  sims[count++] = texture(iChannel0, uvZoom1/txdiv).rgb;
   sims[count++] = WHI * noises1.z;
-  sims[count++] = WHI * noises3.w;
+  sims[count++] = withColor(noises3);
   sims[count++] = WHI * noises1.z;
-  sims[count++] = gscale(texture(iChannel0, uvZoom2/txdiv).rgb);
+  sims[count++] = texture(iChannel0, uvZoom2/txdiv).rgb;
 
   uv2 += .5;
   float gridWidth = 2.0;
