@@ -49,6 +49,31 @@
 			</variables>
 			<macros />
 		</pass>
+		<pass name="Pattern Background 01" type="shader" active="true" patchverts="1" collapsed="true">
+			<shader type="vs" path="shaders\pattern-background-01\vertex.glsl" entry="main" />
+			<shader type="ps" path="shaders\pattern-background-01\fragment.glsl" entry="main" />
+			<inputlayout>
+				<item value="Position" semantic="POSITION" />
+				<item value="Normal" semantic="NORMAL" />
+				<item value="Texcoord" semantic="TEXCOORD0" />
+			</inputlayout>
+			<rendertexture />
+			<items>
+				<item name="PatternBackground01Quad" type="geometry">
+					<type>ScreenQuadNDC</type>
+					<width>1</width>
+					<height>1</height>
+					<depth>1</depth>
+					<topology>TriangleList</topology>
+				</item>
+			</items>
+			<itemvalues />
+			<variables>
+				<variable type="float" name="iTime" system="Time" />
+				<variable type="float2" name="iResolution2D" system="ViewportSize" />
+			</variables>
+			<macros />
+		</pass>
 		<pass name="Replicate Wall01" type="shader" active="false" patchverts="1" collapsed="true">
 			<shader type="vs" path="shaders\replicate-wall01\vertex.glsl" entry="main" />
 			<shader type="ps" path="shaders\replicate-wall01\fragment.glsl" entry="main" />
@@ -99,7 +124,7 @@
 			</variables>
 			<macros />
 		</pass>
-		<pass name="Replicate Abstract Material 01" type="shader" active="true" patchverts="1" collapsed="true">
+		<pass name="Replicate Abstract Material 01" type="shader" active="false" patchverts="1" collapsed="true">
 			<shader type="vs" path="shaders\replicate-abstract-material-01\vertex.glsl" entry="main" />
 			<shader type="ps" path="shaders\replicate-abstract-material-01\fragment.glsl" entry="main" />
 			<inputlayout>
