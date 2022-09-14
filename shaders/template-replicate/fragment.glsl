@@ -38,6 +38,14 @@ vec3 togrey(vec3 c) {
   return vec3((c.r+c.g+c.b)/3.);
 }
 float normrange(float v, float minV, float maxV) { return sat((v-minV)/(maxV-minV)); }
+float xnormrange(float v, float minV, float maxV) { return normrange(v, minV, maxV) * xstep(minV, maxV, v); }
+vec3 mix3(vec3 cMin, vec3 cMid, vec3 cMax, float t) {
+  float t1 = normrange(t, -1., 0.);
+  float t2 = normrange(t, 0., 1.);
+  vec3 c = mix(cMin, cMid, t1);
+  c = mix(c, cMax, t2);
+  return c;
+}
 
 // -------------------
 // BEGIN https://github.com/stegu/webgl-noise
@@ -677,7 +685,8 @@ vec2 rotate(vec2 v, float angle) {
 #define PUR vec3(1., 0., 1.)
 #define YEL vec3(1., 1., 0.)
 #define CYA vec3(0., 1., 1.)
-#define WHI vec3(1., 1., 1.)
+#define WHI vec3(1.)
+#define BLA vec3(0.)
 #define BLANK vec3(0.35, 0., 0.35)
 
 vec4 getNoise(vec2 uv, float t) {
