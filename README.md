@@ -19,9 +19,9 @@ Preview varying how crowded of cloud it will be.
 Preview varying how simple the clouds will be.  
 ![](https://github.com/hugolnx/shaders-laboratory/raw/master/shaders/clouds/preview/preview-simplified.gif)  
 
-## Stars 2D - [Preview on Shadertoy](https://www.shadertoy.com/view/ftcyRS)
+## Animated Background 01 - [Preview on Shadertoy](https://www.shadertoy.com/view/NlGBzR)
 ### Preview
-![](https://github.com/hugolnx/shaders-laboratory/raw/master/shaders/stars/preview/shader-preview-noises-stars.gif)  
+![](https://github.com/hugolnx/shaders-laboratory/raw/master/shaders/pattern-background-01/preview/preview.gif)  
 
 ## Replicate Giraffe Fur - [Preview on Shadertoy](https://www.shadertoy.com/view/flcBRr)
 Shader trying to replicate the texture `giraffe-skin-fur.jpg`.  
@@ -46,6 +46,10 @@ Comparing the shader (upper half) and the original texture (lower half).
 ### Layers / Details
 The right side is a few layers of the shader, and the left side is comparing both, the texture (lower half) and the shader (upper half), in 3 zoom levels.  
 ![](https://github.com/hugolnx/shaders-laboratory/raw/master/shaders/replicate-abstract-material-01/preview/layers.png)  
+
+## Stars 2D - [Preview on Shadertoy](https://www.shadertoy.com/view/ftcyRS)
+### Preview
+![](https://github.com/hugolnx/shaders-laboratory/raw/master/shaders/stars/preview/shader-preview-noises-stars.gif)  
 
 ## Replicate Wall01 - [Preview on Shadertoy](https://www.shadertoy.com/view/flyyWy)
 Shader trying to replicate the texture `wall01.jpg`.  
