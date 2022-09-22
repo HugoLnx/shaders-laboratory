@@ -1,7 +1,7 @@
 #version 330
 //#define SHADERTOY 1
 // GITHUB: https://github.com/HugoLnx/shaders-laboratory/tree/master/shaders/pattern-background-01
-// SHADERTOY: ???
+// SHADERTOY: https://www.shadertoy.com/view/NlGBzR
 
 //#define SEEDROLL 1
 
