@@ -3,6 +3,8 @@
 // GITHUB: https://github.com/HugoLnx/shaders-laboratory/tree/master/shaders/pattern-background-01
 // SHADERTOY: ???
 
+//#define SEEDROLL 1
+
 // Aux simple functions
 #define TWO_PI 6.283185
 #define PI 3.14159
@@ -16,6 +18,9 @@ float xsmoothstep(float b, float e, float v) {
 }
 float flatten(float v, float layers) {
   return floor(v*layers) * (1./layers);
+}
+float flattenfull(float v, float layers) {
+  return floor(v*layers)/(layers-1.);
 }
 float nsin(float t) {return norm(sin(t * TWO_PI));}
 float ncos(float t) {return norm(cos(t * TWO_PI));}
@@ -45,6 +50,11 @@ vec2 rotate(vec2 v, float angle) {
   float s = sin(angle);
   float c = cos(angle);
   return mat2(c, -s, s, c) * v;
+}
+
+vec3 compose(vec3 ocolor, float intensity, vec3 color) {
+  intensity = sat(intensity);
+  return mix(ocolor, color, intensity);
 }
 
 float stepang(vec2 uv, vec2 center,
@@ -85,14 +95,15 @@ uniform vec2 iResolution2D;
 out vec4 outColor;
 #endif
 
-float rand(vec2 uv, float seed){
+float rand(vec2 uv, float seed, float seedModifier){
+  seed += seedModifier;
   uv *= seed+1937.71;
   return fract(sin(
     dot(uv, vec2(12.9898, 78.233)) + seed
   ) * 43758.5453);
 }
-float rand(float x, float seed) {
-  return rand(vec2(x, x+197.937), seed);
+float rand(float x, float seed, float seedModifier) {
+  return rand(vec2(x, x+197.937), seed, seedModifier);
 }
 float circle(vec2 uv, vec2 center, float radius) {
   uv -= center;
@@ -100,66 +111,132 @@ float circle(vec2 uv, vec2 center, float radius) {
   return step(dist, radius);
 }
 
+float doline(vec2 uv, vec2 pt1, vec2 pt2, float linewidth) {
+  vec2 v = pt2 - pt1;
+  uv -= pt1;
+  float vlen = length(v);
+  vec2 vhead = v / vlen;
+  float proj = dot(vhead, uv);
+  vec2 vproj = vhead * proj;
+  float toLine = length(uv - vproj);
+  return (1.-step(linewidth, toLine)) * xstep(0., vlen, proj);
+}
+
 #define PIECOLORCOUNT 3
+#define STRIPECOLORCOUNT 3
+//#define ZOOMGRID 1
+//#define MOBILE_SHADER_EDITOR 1
+
+#ifdef MOBILE_SHADER_EDITOR
+#define iResolution resolution
+#define iTime time
+#endif
+
+vec3 composeLine(vec3 ocolor, vec2 uv, vec2 guv, float t, float appearRate, float lineSeedMod,
+float seedModifier, vec3[STRIPECOLORCOUNT] stripecolors, vec2 linePt1, vec2 linePt2) {
+  float lineWidth = 0.075;
+  float maxTimeOffset = 100.;
+  float frameDuration = 2.;
+  float tRand = rand(guv, 771.339*lineSeedMod, seedModifier);
+  float tOffset = (tRand-.5)*2. * maxTimeOffset;
+  t += tOffset;
+  float frameInx = floor(t / frameDuration);
+  float frameTime = mod(t, frameDuration);
+  float frameStart = normrange(frameTime, 0., 1.);
+  float nFrameTime = normrange(frameTime, 0., frameDuration);
+  float frameEnd = 1.-normrange(frameTime, frameDuration-1., frameDuration);
+  float frameMod = frameInx * 372.297;
+
+  float invRand = step(.5, rand(guv, 771.339*lineSeedMod, seedModifier+frameMod));
+  vec2 pt1 = invRand == 1. ? linePt1 : linePt2;
+  vec2 pt2 = invRand == 1. ? linePt2 : linePt1;
+  float line = doline(uv, pt1, pt1+(pt2-pt1)*nFrameTime, lineWidth);
+
+  float dRand = rand(guv/17.73, 117.994*lineSeedMod, seedModifier+frameMod);
+  line *= step(1.-appearRate, dRand);
+  line *= frameStart * frameEnd * .5;
+
+  float colorRand = rand(guv, 171.274*lineSeedMod, seedModifier+frameMod);
+  int colorInx = int(floor(colorRand*float(STRIPECOLORCOUNT)));
+  vec3 stripecolor = stripecolors[colorInx];
+  vec3 color = compose(ocolor, line, stripecolor);
+  return color;
+}
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-  // // Normalized pixel coordinates (from -0.5 to 0.5)
-  // float mx = max(iResolution.x, iResolution.y);
-  // vec2 ct = iResolution.xy / mx / 2.0;
-  // vec2 uv = fragCoord/mx - ct;
-  // vec2 uv2 = fragCoord / iResolution.xy - .5;
-
-  // float t = iTime;
-  // vec3 c = YEL;
-
-  // // Output to screen
-  // fragColor = vec4(c, 1.0);
-
   float mx = max(iResolution.x, iResolution.y);
   vec2 ct = iResolution.xy / mx / 2.0;
   vec2 uv = fragCoord/mx - ct;
+#ifndef MOBILE_SHADER_EDITOR
+  uv /= 2.5;
+#endif
+  vec2 ouv = uv;
   float t = iTime;
+#ifdef SEEDROLL
+  float seedModifier = floor(t*.33);
+#else
+  float seedModifier = 0.;
+#endif
 
+#ifdef MOBILE_SHADER_EDITOR
   float radius = .35;
+  float minRadiusVar = .35;
+#else
+  float radius = .45;
+  float minRadiusVar = .5;
+#endif
+  float maxCentervar = (.5-radius)*.5*0.95;
+#ifdef ZOOMGRID
+  float gridScale = 15.;
+#else
   float gridScale = 40.;
+#endif
   vec3[PIECOLORCOUNT] piecolors;
   piecolors[0] = vec3(1., .4, .4);
   piecolors[1] = vec3(1., .4, .7);
   piecolors[2] = vec3(1., .7, .4);
 
-  vec2 guv = floor(uv*gridScale);
-  uv = fract(uv*gridScale);
+  vec3[STRIPECOLORCOUNT] stripecolors;
+  float lo = 0.75;
+  stripecolors[0] = vec3(lo, lo, 1.);
+  stripecolors[1] = vec3(1., lo, lo);
+  stripecolors[2] = vec3(lo, 1., lo);
+
+  uv *= gridScale;
+  vec2 guv = floor(uv);
+  uv = fract(uv);
   uv -= .5;
   vec2 center = vec2(.0);
 
-  float angsize = flatten(rand(guv, 137.791), 3.);
+  float angsize = flattenfull(rand(guv, 137.791, seedModifier), 3.);
   angsize = mix(PI/4.*3., PI/4.*7., angsize);
   float rotlayers = 5.;
-  float pierot = flatten(rand(guv, 737.197), 4.);
+  float pierot = flattenfull(rand(guv, 737.197, seedModifier), 4.);
   pierot = mix(PI/2., TWO_PI, pierot);
 
   int piecolorinx = int(floor(
-    rand(guv, 397.917)*float(PIECOLORCOUNT)
+    rand(guv, 397.917, seedModifier)*float(PIECOLORCOUNT)
   ));
 
-  float radiusvar = flatten(rand(guv, 587.173), 3.);
-  radiusvar = mix(.35, 1., radiusvar);
+  float radiusvar = flattenfull(rand(guv, 587.173, seedModifier), 3.);
+  radiusvar = mix(minRadiusVar, 1., radiusvar);
+  //radiusvar = 1.;
 
   vec2 centervar = vec2(
-    flatten(rand(guv.xy, 345.123), 3.),
-    flatten(rand(guv.yx, 354.132), 3.)
+    flattenfull(rand(guv.xy, 345.123, seedModifier), 3.),
+    flattenfull(rand(guv.yx, 354.132, seedModifier), 3.)
   );
   centervar = (centervar-.5)*2.;
-  centervar *= .08;
-  center += centervar;
+  centervar *= maxCentervar;
+  //center += centervar; 
 
   float pie = circle(uv, center, radius*radiusvar);
   pie *= stepang(uv, center, 0., angsize, pierot);
 
-  float dotradius = flatten(rand(guv, 897.217), 3.);
+  float dotradius = flattenfull(rand(guv, 897.217, seedModifier), 3.);
   dotradius = mix(.03, .15, dotradius);
-  float hasdot = step(.96, rand(guv, 227.994));
+  float hasdot = step(.96, rand(guv, 227.994, seedModifier));
   float dotted = hasdot*circle(uv, center, dotradius);
 
 
@@ -167,8 +244,36 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
   float ndotted = 1.-dotted;
 
   vec3 color = vec3(0.);
-  color += ndotted*pie * piecolors[piecolorinx];
 
+
+  vec2 diaguv = ouv;
+  diaguv *= gridScale;
+  diaguv -= .5;
+  vec2 diagGuv = floor(diaguv);
+  diaguv = fract(diaguv);
+  diaguv -= .5;
+
+  vec2 xuv = ouv;
+  xuv *= gridScale;
+  xuv.x -= .5;
+  vec2 xGuv = floor(xuv);
+  xuv = fract(xuv);
+  xuv -= .5;
+
+  vec2 yuv = ouv;
+  yuv *= gridScale;
+  yuv.y -= .5;
+  vec2 yGuv = floor(yuv);
+  yuv = fract(yuv);
+  yuv -= .5;
+  float diagAppearRate = .4;
+  float axisAppearRate = .3;
+  color = composeLine(color, diaguv, diagGuv, t, diagAppearRate, 0.  , seedModifier, stripecolors, vec2(-.5), vec2(.5));
+  color = composeLine(color, diaguv, diagGuv, t, diagAppearRate, 132., seedModifier, stripecolors, vec2(-.5, .5), vec2(.5, -.5));
+  color = composeLine(color, xuv, xGuv, t, axisAppearRate, 212., seedModifier, stripecolors, vec2(-.5, .0), vec2(.5, .0) );
+  color = composeLine(color, yuv, yGuv, t, axisAppearRate, 398., seedModifier, stripecolors, vec2(.0, .5), vec2(.0, -.5) );
+
+  color = compose(color, ndotted*pie, piecolors[piecolorinx]);
 
   fragColor = vec4(color, 1.0);
 }
